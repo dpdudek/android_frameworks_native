@@ -98,7 +98,6 @@ bool LegacyOrientationSensor::process(sensors_event_t* outEvent,
         Az *= invA;
         const float Mx = Ay*Hz - Az*Hy;
         const float My = Az*Hx - Ax*Hz;
-        const float Mz = Ax*Hy - Ay*Hx;
 
         // construct real rotation matrix
         mat33_t R;
@@ -136,14 +135,14 @@ status_t LegacyOrientationSensor::activate(void* ident, bool enabled) {
         mMagTime = 0;
         mAccTime = 0;
     }
-    return mSensorFusion.activate(ident, enabled);
+    return mSensorFusion.activate(FUSION_9AXIS, ident, enabled);
 }
 
-status_t LegacyOrientationSensor::setDelay(void* ident, int handle, int64_t ns) {
-    return mSensorFusion.setDelay(ident, ns);
+status_t LegacyOrientationSensor::setDelay(void* ident, int , int64_t ns) {
+    return mSensorFusion.setDelay(FUSION_9AXIS, ident, ns);
 }
 
-Sensor LegacyOrientationSensor::getSensor() const {
+Sensor& LegacyOrientationSensor::getSensor() const {
     sensor_t hwSensor;
     hwSensor.name       = "Orientation Sensor";
     hwSensor.vendor     = "AOSP";
@@ -154,8 +153,20 @@ Sensor LegacyOrientationSensor::getSensor() const {
     hwSensor.resolution = 1.0f/256.0f; // FIXME: real value here
     hwSensor.power      = mSensorFusion.getPowerUsage();
     hwSensor.minDelay   = mSensorFusion.getMinDelay();
-    Sensor sensor(&hwSensor);
-    return sensor;
+    Sensor *sensor = new Sensor(&hwSensor);
+    return *sensor;
+}
+
+status_t LegacyOrientationSensor::batch(void* , int , int , int64_t ,
+                       int64_t ) {
+	return NO_ERROR;
+}
+
+status_t LegacyOrientationSensor::flush(void* , int ) {
+	return NO_ERROR;
+}
+
+void LegacyOrientationSensor::autoDisable(void* , int ) {
 }
 
 // ---------------------------------------------------------------------------

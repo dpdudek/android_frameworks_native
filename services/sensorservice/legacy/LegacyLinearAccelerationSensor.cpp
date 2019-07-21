@@ -64,7 +64,7 @@ status_t LegacyLinearAccelerationSensor::setDelay(void* ident, int handle, int64
     return mGravitySensor.setDelay(ident, handle, ns);
 }
 
-Sensor LegacyLinearAccelerationSensor::getSensor() const {
+Sensor& LegacyLinearAccelerationSensor::getSensor() const {
     Sensor gsensor(mGravitySensor.getSensor());
     sensor_t hwSensor;
     hwSensor.name       = "Linear Acceleration Sensor";
@@ -76,8 +76,20 @@ Sensor LegacyLinearAccelerationSensor::getSensor() const {
     hwSensor.resolution = gsensor.getResolution();
     hwSensor.power      = gsensor.getPowerUsage();
     hwSensor.minDelay   = gsensor.getMinDelay();
-    Sensor sensor(&hwSensor);
-    return sensor;
+    Sensor *sensor = new Sensor(&hwSensor);
+    return *sensor;
+}
+
+status_t LegacyLinearAccelerationSensor::batch(void* , int , int , int64_t ,
+                       int64_t ) {
+	return NO_ERROR;
+}
+
+status_t LegacyLinearAccelerationSensor::flush(void* , int ) {
+	return NO_ERROR;
+}
+
+void LegacyLinearAccelerationSensor::autoDisable(void* , int ) {
 }
 
 // ---------------------------------------------------------------------------

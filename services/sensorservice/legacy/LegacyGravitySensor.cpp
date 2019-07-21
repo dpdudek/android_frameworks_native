@@ -75,14 +75,14 @@ bool LegacyGravitySensor::process(sensors_event_t* outEvent,
 }
 
 status_t LegacyGravitySensor::activate(void* ident, bool enabled) {
-    return mSensorFusion.activate(ident, enabled);
+    return mSensorFusion.activate(FUSION_9AXIS, ident, enabled);
 }
 
-status_t LegacyGravitySensor::setDelay(void* ident, int handle, int64_t ns) {
-    return mSensorFusion.setDelay(ident, ns);
+status_t LegacyGravitySensor::setDelay(void* ident, int , int64_t ns) {
+    return mSensorFusion.setDelay(FUSION_9AXIS, ident, ns);
 }
 
-Sensor LegacyGravitySensor::getSensor() const {
+Sensor& LegacyGravitySensor::getSensor() const {
     sensor_t hwSensor;
     hwSensor.name       = "Gravity Sensor";
     hwSensor.vendor     = "AOSP";
@@ -93,8 +93,21 @@ Sensor LegacyGravitySensor::getSensor() const {
     hwSensor.resolution = mAccelerometer.getResolution();
     hwSensor.power      = mSensorFusion.getPowerUsage();
     hwSensor.minDelay   = mSensorFusion.getMinDelay();
-    Sensor sensor(&hwSensor);
-    return sensor;
+
+    Sensor *sensor = new Sensor(&hwSensor);
+    return *sensor;
+}
+
+status_t LegacyGravitySensor::batch(void* , int , int , int64_t ,
+                       int64_t ) {
+	return NO_ERROR;
+}
+
+status_t LegacyGravitySensor::flush(void* , int ) {
+	return NO_ERROR;
+}
+
+void LegacyGravitySensor::autoDisable(void* , int ) {
 }
 
 // ---------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <gui/Sensor.h>
+#include <sensor/Sensor.h>
 
 #include "../SensorInterface.h"
 #include "LegacyGravitySensor.h"
@@ -43,8 +43,12 @@ public:
     LegacyLinearAccelerationSensor(sensor_t const* list, size_t count);
     virtual status_t activate(void* ident, bool enabled);
     virtual status_t setDelay(void* ident, int handle, int64_t ns);
-    virtual Sensor getSensor() const;
+    virtual Sensor& getSensor() const;
     virtual bool isVirtual() const { return true; }
+    virtual status_t batch(void* ident, int handle, int flags, int64_t samplingPeriodNs,
+                           int64_t maxBatchReportLatencyNs);
+    virtual status_t flush(void* ident, int handle);
+    virtual void autoDisable(void* ident, int handle);
 };
 
 // ---------------------------------------------------------------------------

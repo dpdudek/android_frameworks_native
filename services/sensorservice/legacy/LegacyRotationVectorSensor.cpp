@@ -98,7 +98,6 @@ bool LegacyRotationVectorSensor::process(sensors_event_t* outEvent,
         Az *= invA;
         const float Mx = Ay*Hz - Az*Hy;
         const float My = Az*Hx - Ax*Hz;
-        const float Mz = Ax*Hy - Ay*Hx;
 
         // construct real rotation matrix
         mat33_t R;
@@ -130,14 +129,14 @@ status_t LegacyRotationVectorSensor::activate(void* ident, bool enabled) {
         mMagTime = 0;
         mAccTime = 0;
     }
-    return mSensorFusion.activate(ident, enabled);
+    return mSensorFusion.activate(FUSION_9AXIS, ident, enabled);
 }
 
-status_t LegacyRotationVectorSensor::setDelay(void* ident, int handle, int64_t ns) {
-    return mSensorFusion.setDelay(ident, ns);
+status_t LegacyRotationVectorSensor::setDelay(void* ident, int , int64_t ns) {
+    return mSensorFusion.setDelay(FUSION_9AXIS, ident, ns);
 }
 
-Sensor LegacyRotationVectorSensor::getSensor() const {
+Sensor& LegacyRotationVectorSensor::getSensor() const {
     sensor_t hwSensor;
     hwSensor.name       = "Rotation Vector Sensor";
     hwSensor.vendor     = "AOSP";
@@ -148,8 +147,20 @@ Sensor LegacyRotationVectorSensor::getSensor() const {
     hwSensor.resolution = 1.0f / (1<<24);
     hwSensor.power      = mSensorFusion.getPowerUsage();
     hwSensor.minDelay   = mSensorFusion.getMinDelay();
-    Sensor sensor(&hwSensor);
-    return sensor;
+    Sensor *sensor = new Sensor(&hwSensor);
+    return *sensor;
+}
+
+status_t LegacyRotationVectorSensor::batch(void* , int , int , int64_t ,
+                       int64_t ) {
+	return NO_ERROR;
+}
+
+status_t LegacyRotationVectorSensor::flush(void* , int ) {
+	return NO_ERROR;
+}
+
+void LegacyRotationVectorSensor::autoDisable(void* , int ) {
 }
 
 // ---------------------------------------------------------------------------
